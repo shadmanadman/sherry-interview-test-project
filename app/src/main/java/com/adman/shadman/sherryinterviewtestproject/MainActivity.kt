@@ -4,14 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.adman.shadman.sherryinterviewtestproject.ui.theme.SherryInterviewTestProjectTheme
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,28 +23,44 @@ class MainActivity : ComponentActivity() {
         setContent {
             SherryInterviewTestProjectTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    MapScreen(innerPadding)
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
+
 @Composable
-fun GreetingPreview() {
-    SherryInterviewTestProjectTheme {
-        Greeting("Android")
+fun MapScreen(innersPadding: PaddingValues) {
+    val singapore = LatLng(1.35, 103.87) // Example: Singapore coordinates
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(singapore, 10f) // Set initial camera position and zoom
+    }
+
+    GoogleMap(
+        modifier = Modifier.fillMaxSize().padding(innersPadding),
+        cameraPositionState = cameraPositionState,
+        // Optional: Customize map properties and UI settings
+        // properties = MapProperties(mapType = MapType.HYBRID, isTrafficEnabled = true),
+        // uiSettings = MapUiSettings(zoomControlsEnabled = true, myLocationButtonEnabled = true),
+        onMapLoaded = {
+            // Map is loaded and ready for interaction (e.g., adding markers dynamically)
+        }
+    ) {
+        // Content for the map: markers, polylines, etc.
+//        Marker(
+//            state = MarkerState(position = singapore),
+//            title = "Marker in Singapore",
+//            snippet = "Some details about Singapore"
+//        )
+
+        // You can add more markers, polylines, polygons here
+        // val sydney = LatLng(-34.0, 151.0)
+        // Marker(
+        //    state = MarkerState(position = sydney),
+        //    title = "Marker in Sydney"
+        // )
     }
 }
