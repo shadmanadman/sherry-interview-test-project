@@ -5,11 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.adman.shadman.sherryinterviewtestproject.data.model.Trip
-import com.adman.shadman.sherryinterviewtestproject.domain.TripRepo
+import com.adman.shadman.sherryinterviewtestproject.data.db.TripDao
 
 @Database(entities = [Trip::class], version = 1, exportSchema = false)
 abstract class TripDatabase : RoomDatabase() {
-    abstract fun tripDao(): TripRepo
+    abstract fun tripDao(): TripDao
     companion object Companion {
         @Volatile
         private var INSTANCE: TripDatabase? = null
