@@ -46,6 +46,13 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.maps.compose)
 
+    // DB
+    implementation(libs.androidx.room.runtime)
+
+    // viewmodel
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
