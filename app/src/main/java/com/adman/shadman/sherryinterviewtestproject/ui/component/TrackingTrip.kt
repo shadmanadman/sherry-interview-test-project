@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,8 @@ import java.nio.file.WatchEvent
 import java.sql.Time
 import java.time.Instant
 import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -62,6 +65,8 @@ fun TrackingTrips(
     var hasUserStartedTracking by remember { mutableStateOf(false) }
     var showUserTrips by remember { mutableStateOf(false) }
     var showSetting by remember { mutableStateOf(false) }
+
+    val state by settingViewModel.uiState.collectAsState()
 
     if (showUserTrips)
         AllTripScreen(
@@ -200,7 +205,7 @@ fun TrackingTrips(
                 IconButton(onClick = {
                     startOfTripTime.longValue = Instant.now().toEpochMilli()
                     hasUserStartedTracking = true
-                    locationTracker.startTracking()
+                    locationTracker.startTracking(state.interval.toDuration(DurationUnit.MILLISECONDS).inWholeMilliseconds)
                     Toast.makeText(context, "Tracking Started!", Toast.LENGTH_SHORT).show()
                 }) {
                     Icon(

@@ -31,7 +31,7 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
     private var lastLocation: Location? = null
     private var startTimeMillis: Long = 0L
     private var totalDistanceMeters = 0f
-    private var pausedTimeMillis: Long = 0L // To accumulate paused duration
+    private var pausedTimeMillis: Long = 0L
 
     private val handler = android.os.Handler(Looper.getMainLooper())
     private val updateMetricsRunnable = object : Runnable {
@@ -62,7 +62,6 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
                     }
                     lastLocation = newLocation
 
-                    // Add to path
                     pathPoints.add(LatLng(newLocation.latitude, newLocation.longitude))
                     Log.d("LocationTracker", "New location: ${newLocation.latitude}, ${newLocation.longitude}, Speed: $currentSpeedKmh km/h, Total Distance: $totalDistanceMeters m")
                 } else if (trackingState.value == TrackingState.IDLE) {
@@ -75,10 +74,10 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
     }
 
     // Call this from DisposableEffect ON_START if trackingState is TRACKING
-    @Suppress("MissingPermission") // Permissions are checked in MainActivity
-    fun startLocationUpdates() {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000) // Update every 5 seconds
-            .setMinUpdateIntervalMillis(3000) // Minimum 3 seconds between updates
+    @Suppress("MissingPermission")
+    fun startLocationUpdates(minUpdateInterval:Long) {
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, minUpdateInterval) // Update every 5 seconds
+            .setMinUpdateIntervalMillis(minUpdateInterval)
             .build()
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
         Log.d("LocationTracker", "Location updates started.")
@@ -90,7 +89,7 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
     }
 
 
-    fun startTracking() {
+    fun startTracking(timeInterval:Long) {
         if (trackingState.value == TrackingState.IDLE || trackingState.value == TrackingState.PAUSED) {
             if (trackingState.value == TrackingState.IDLE) {
                 // Reset for a new track
@@ -105,7 +104,7 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
                 pausedTimeMillis = 0L // Reset paused time after resuming
             }
             trackingState.value = TrackingState.TRACKING
-            startLocationUpdates() // Start listening for location updates
+            startLocationUpdates(timeInterval) // Start listening for location updates
             handler.post(updateMetricsRunnable) // Start the time/metrics updater
             Log.d("LocationTracker", "Tracking started/resumed.")
         }
