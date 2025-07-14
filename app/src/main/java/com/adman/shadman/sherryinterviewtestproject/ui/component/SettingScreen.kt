@@ -30,7 +30,7 @@ fun SettingScreen(settingViewModel: SettingViewModel,onDismiss:()->Unit) {
             Slider(
                 value = state.interval.toFloat(),
                 onValueChange = { settingViewModel.updateInterval(it.toInt()) },
-                valueRange = 0.5f..5f
+                valueRange = 0.5f..6f
             )
 
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {

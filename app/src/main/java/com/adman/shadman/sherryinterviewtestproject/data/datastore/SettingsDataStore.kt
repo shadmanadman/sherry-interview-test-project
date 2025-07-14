@@ -20,7 +20,7 @@ class SettingsDataStore(private val context: Context) {
 
     val selectedInterval: Flow<Int> =
         context.dataStore.data.map { prefs ->
-            prefs[SettingsKeys.SELECTED_INTERVAL] ?: 60
+            prefs[SettingsKeys.SELECTED_INTERVAL] ?: 1
         }
 
     val backgroundTracking: Flow<Boolean> =

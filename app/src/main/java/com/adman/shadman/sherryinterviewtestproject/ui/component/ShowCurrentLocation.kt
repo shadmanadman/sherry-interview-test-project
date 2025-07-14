@@ -11,6 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 
+// Getting current user location and update the map
 @Composable
 fun ShowCurrentLocation(
     locationPermissionsGranted: Boolean,
@@ -21,7 +22,6 @@ fun ShowCurrentLocation(
     DisposableEffect(lifecycleOwner.lifecycle, locationPermissionsGranted) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START && locationPermissionsGranted) {
-                // When the app starts and permissions are granted, try to get last known location
                 try {
                     fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                         location?.let {

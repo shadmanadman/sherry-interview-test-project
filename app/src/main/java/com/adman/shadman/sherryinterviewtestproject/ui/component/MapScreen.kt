@@ -41,7 +41,9 @@ fun MapScreen(
             if (pathPoints.isNotEmpty())
                 cameraPositionState.move(update = CameraUpdateFactory.newLatLng(pathPoints.last()))
         }
-        onDispose { }
+        onDispose {
+            locationTracker.pauseTracking()
+        }
     }
 
     GoogleMap(
@@ -54,10 +56,7 @@ fun MapScreen(
         ),
         properties = MapProperties(
             isMyLocationEnabled = locationPermissionsGranted
-        ),
-        onMapLoaded = {
-            // Map is loaded and ready for interaction (e.g., adding markers dynamically)
-        }
+        )
     ) {
         // Draw the tracking path
         if (pathPoints.isNotEmpty()) {

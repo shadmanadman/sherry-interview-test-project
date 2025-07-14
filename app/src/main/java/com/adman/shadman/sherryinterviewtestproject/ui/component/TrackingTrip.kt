@@ -1,5 +1,7 @@
 package com.adman.shadman.sherryinterviewtestproject.ui.component
 
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -14,10 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,18 +30,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.adman.shadman.sherryinterviewtestproject.R
+import com.adman.shadman.sherryinterviewtestproject.ui.service.INTERVAL
+import com.adman.shadman.sherryinterviewtestproject.ui.service.LocationTrackingService
 import com.adman.shadman.sherryinterviewtestproject.ui.theme.Typography
 import com.adman.shadman.sherryinterviewtestproject.ui.viewmodel.SettingViewModel
 import com.adman.shadman.sherryinterviewtestproject.ui.viewmodel.TripViewModel
-import java.nio.file.WatchEvent
-import java.sql.Time
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.time.DurationUnit
@@ -67,6 +66,9 @@ fun TrackingTrips(
     var showSetting by remember { mutableStateOf(false) }
 
     val state by settingViewModel.uiState.collectAsState()
+
+    val selectedTimeInterval =
+        state.interval.toDuration(DurationUnit.MILLISECONDS).inWholeMilliseconds
 
     if (showUserTrips)
         AllTripScreen(
@@ -173,7 +175,7 @@ fun TrackingTrips(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
                 IconButton(onClick = {
                     if (hasUserStartedTracking) {
@@ -183,7 +185,7 @@ fun TrackingTrips(
                             endTime = endOfTripTime.longValue,
                             distance = ((currentMetrics.distanceMeters / 1000).toLong())
                         )
-                        locationTracker.stopTracking()
+                        context.stopTrackingService()
                         Toast.makeText(
                             context,
                             "Tracking Stopped! Your trip has been saved.",
@@ -193,7 +195,7 @@ fun TrackingTrips(
                     } else
                         Toast.makeText(
                             context,
-                            "No tracking has been started. Please Start one.",
+                            "No tracking has been started. Please Start one first.",
                             Toast.LENGTH_LONG
                         ).show()
                 }) {
@@ -205,7 +207,7 @@ fun TrackingTrips(
                 IconButton(onClick = {
                     startOfTripTime.longValue = Instant.now().toEpochMilli()
                     hasUserStartedTracking = true
-                    locationTracker.startTracking(state.interval.toDuration(DurationUnit.MILLISECONDS).inWholeMilliseconds)
+                    context.startTrackingService(selectedTimeInterval)
                     Toast.makeText(context, "Tracking Started!", Toast.LENGTH_SHORT).show()
                 }) {
                     Icon(
@@ -241,4 +243,16 @@ fun formatElapsedTime(millis: Long): String {
     val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(millis) % 60
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+
+fun Context.startTrackingService(timeInterval: Long) {
+    val intent = Intent(this, LocationTrackingService::class.java).apply {
+        putExtra(INTERVAL, timeInterval)
+    }
+    ContextCompat.startForegroundService(this, intent)
+}
+
+fun Context.stopTrackingService() {
+    stopService(Intent(this, LocationTrackingService::class.java))
 }

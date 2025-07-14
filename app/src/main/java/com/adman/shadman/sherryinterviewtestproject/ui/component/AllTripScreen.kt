@@ -33,8 +33,8 @@ fun AllTripScreen(tripViewModel: TripViewModel, onDismiss: () -> Unit) {
     val allTrips by tripViewModel.allTrips.observeAsState()
     ModalBottomSheet(onDismissRequest = onDismiss) {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
-            if (allTrips.isNullOrEmpty().not()) {
-                items(allTrips?.size ?: 0) { index ->
+            items(allTrips?.size ?: 0) { index ->
+                if (allTrips.isNullOrEmpty().not()) {
                     Column {
                         Text(
                             text = "Trip ${index.plus(1)}",
@@ -63,9 +63,15 @@ fun AllTripScreen(tripViewModel: TripViewModel, onDismiss: () -> Unit) {
 
                         VerticalDivider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp)
                     }
-
-                }
+                } else
+                    Text(
+                        text = "No trips yet",
+                        style = Typography.titleMedium.copy(Color.Black),
+                        modifier = Modifier
+                            .padding(8.dp)
+                    )
             }
+
         }
     }
 }

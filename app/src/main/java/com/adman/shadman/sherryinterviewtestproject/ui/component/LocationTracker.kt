@@ -73,7 +73,6 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
         }
     }
 
-    // Call this from DisposableEffect ON_START if trackingState is TRACKING
     @Suppress("MissingPermission")
     fun startLocationUpdates(minUpdateInterval:Long) {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, minUpdateInterval) // Update every 5 seconds
@@ -97,15 +96,15 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
                 metrics.value = TrackingMetrics()
                 pathPoints.clear()
                 startTimeMillis = System.currentTimeMillis()
-                pausedTimeMillis = 0L // Reset paused time for a new session
+                pausedTimeMillis = 0L
             } else if (trackingState.value == TrackingState.PAUSED) {
                 // Adjust start time for resume
                 startTimeMillis += (System.currentTimeMillis() - (startTimeMillis + metrics.value.elapsedTimeMillis + pausedTimeMillis))
-                pausedTimeMillis = 0L // Reset paused time after resuming
+                pausedTimeMillis = 0L
             }
             trackingState.value = TrackingState.TRACKING
-            startLocationUpdates(timeInterval) // Start listening for location updates
-            handler.post(updateMetricsRunnable) // Start the time/metrics updater
+            startLocationUpdates(timeInterval)
+            handler.post(updateMetricsRunnable)
             Log.d("LocationTracker", "Tracking started/resumed.")
         }
     }
@@ -114,8 +113,8 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
     fun pauseTracking() {
         if (trackingState.value == TrackingState.TRACKING) {
             trackingState.value = TrackingState.PAUSED
-            stopLocationUpdates() // Stop frequent location updates to save battery
-            handler.removeCallbacks(updateMetricsRunnable) // Stop time updates
+            stopLocationUpdates()
+            handler.removeCallbacks(updateMetricsRunnable)
             pausedTimeMillis += (System.currentTimeMillis() - (startTimeMillis + metrics.value.elapsedTimeMillis + pausedTimeMillis)) // Accumulate paused time
             Log.d("LocationTracker", "Tracking paused.")
         }
@@ -124,8 +123,8 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
     fun stopTracking() {
         if (trackingState.value != TrackingState.IDLE) {
             trackingState.value = TrackingState.IDLE
-            stopLocationUpdates() // Stop location updates
-            handler.removeCallbacks(updateMetricsRunnable) // Stop time updates
+            stopLocationUpdates()
+            handler.removeCallbacks(updateMetricsRunnable)
              metrics.value = TrackingMetrics()
              pathPoints.clear()
             Log.d("LocationTracker", "Tracking stopped.")

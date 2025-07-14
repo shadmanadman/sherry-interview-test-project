@@ -48,16 +48,18 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 
 class MainActivity : ComponentActivity() {
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var locationPermissionsGranted by mutableStateOf(false)
+    private var notificationPermissionsGranted by mutableStateOf(false)
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             locationPermissionsGranted =
                 permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                         permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-            if (!locationPermissionsGranted) {
-                Log.w("MainActivity", "Location permissions denied by user.")
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                notificationPermissionsGranted =
+                    permissions[Manifest.permission.POST_NOTIFICATIONS] == true
             }
         }
 
@@ -65,9 +67,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
         checkLocationPermissions()
 
         val tripViewModel = TripViewModel(AppContainer.useCases)
@@ -75,14 +74,14 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SherryInterviewTestProjectTheme {
-                val locationTracker = remember { LocationTracker(fusedLocationClient) }
+                val locationTracker = remember { AppContainer.locationTracker }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.fillMaxSize()) {
                         MapScreen(
                             innersPadding = innerPadding,
                             locationPermissionsGranted = locationPermissionsGranted,
-                            fusedLocationClient = fusedLocationClient,
+                            fusedLocationClient = AppContainer.fusedClient,
                             locationTracker = locationTracker
                         )
                         TrackingTrips(
@@ -109,13 +108,32 @@ class MainActivity : ComponentActivity() {
                 ) == PackageManager.PERMISSION_GRANTED
 
         if (!locationPermissionsGranted) {
-            // Request permissions if not granted
             requestPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             )
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+            notificationPermissionsGranted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+
+            if (!notificationPermissionsGranted) {
+                requestPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                )
+            }
         }
     }
 }
