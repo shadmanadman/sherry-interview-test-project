@@ -2,12 +2,14 @@ package com.adman.shadman.sherryinterviewtestproject.ui.component
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,12 +24,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.adman.shadman.sherryinterviewtestproject.data.datastore.SettingsDataStore
 import com.adman.shadman.sherryinterviewtestproject.di.AppContainer
 import com.adman.shadman.sherryinterviewtestproject.ui.theme.SherryInterviewTestProjectTheme
+import com.adman.shadman.sherryinterviewtestproject.ui.viewmodel.SettingViewModel
 import com.adman.shadman.sherryinterviewtestproject.ui.viewmodel.TripViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -56,6 +61,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -65,6 +71,7 @@ class MainActivity : ComponentActivity() {
         checkLocationPermissions()
 
         val tripViewModel = TripViewModel(AppContainer.useCases)
+        val settingViewModel = SettingViewModel(SettingsDataStore(this))
 
         setContent {
             SherryInterviewTestProjectTheme {
@@ -79,6 +86,7 @@ class MainActivity : ComponentActivity() {
                             locationTracker = locationTracker
                         )
                         TrackingTrips(
+                            settingViewModel = settingViewModel,
                             tripViewModel = tripViewModel,
                             locationTracker = locationTracker,
                             modifier = Modifier.align(alignment = Alignment.BottomCenter)

@@ -38,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.adman.shadman.sherryinterviewtestproject.R
 import com.adman.shadman.sherryinterviewtestproject.ui.theme.Typography
+import com.adman.shadman.sherryinterviewtestproject.ui.viewmodel.SettingViewModel
 import com.adman.shadman.sherryinterviewtestproject.ui.viewmodel.TripViewModel
 import java.nio.file.WatchEvent
 import java.sql.Time
@@ -48,6 +49,7 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun TrackingTrips(
     tripViewModel: TripViewModel,
+    settingViewModel: SettingViewModel,
     locationTracker: LocationTracker,
     modifier: Modifier
 ) {
@@ -69,7 +71,7 @@ fun TrackingTrips(
             })
 
     if (showSetting)
-        SettingScreen(onDismiss = {
+        SettingScreen(settingViewModel = settingViewModel, onDismiss = {
             showSetting = false
         })
 
