@@ -11,10 +11,10 @@ import kotlinx.coroutines.launch
 
 class TripViewModel(private val useCases: TripUseCases) : ViewModel() {
 
-    val allFoods: LiveData<List<Trip>> = useCases.allTripsUseCase.execute()
+    val allTrips: LiveData<List<Trip>> = useCases.allTripsUseCase.execute()
         .asLiveData(viewModelScope.coroutineContext)
 
-    fun addTrip(startTime: Long, endTime: Long, distance: List<LatLng>) {
+    fun addTrip(startTime: Long, endTime: Long, distance: Long) {
         viewModelScope.launch {
             useCases.addTripUseCase.execute(startTime, endTime, distance)
         }

@@ -26,7 +26,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.adman.shadman.sherryinterviewtestproject.di.AppContainer
 import com.adman.shadman.sherryinterviewtestproject.ui.theme.SherryInterviewTestProjectTheme
+import com.adman.shadman.sherryinterviewtestproject.ui.viewmodel.TripViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdate
@@ -56,11 +58,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         checkLocationPermissions()
 
-        enableEdgeToEdge()
+        val tripViewModel = TripViewModel(AppContainer.useCases)
+
         setContent {
             SherryInterviewTestProjectTheme {
                 val locationTracker = remember { LocationTracker(fusedLocationClient) }
@@ -74,6 +79,7 @@ class MainActivity : ComponentActivity() {
                             locationTracker = locationTracker
                         )
                         TrackingTrips(
+                            tripViewModel = tripViewModel,
                             locationTracker = locationTracker,
                             modifier = Modifier.align(alignment = Alignment.BottomCenter)
                         )

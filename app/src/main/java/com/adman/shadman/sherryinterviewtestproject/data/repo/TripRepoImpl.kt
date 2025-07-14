@@ -10,7 +10,7 @@ class TripRepoImpl(private val tripDao: TripDao): TripRepo {
     override suspend fun addTrip(
         startTime: Long,
         endTime: Long,
-        distance: List<LatLng>
+        distance: Long
     ) {
         tripDao.insert(Trip(startTime = startTime, endTime = endTime, distance = distance))
     }

@@ -26,11 +26,7 @@ object AppContainer {
 
     fun initialize(context: Context) {
         // Initialize the database
-        database = Room.databaseBuilder(
-            context.applicationContext,
-            TripDatabase::class.java,
-            "app_database"
-        ).build()
+        database = TripDatabase.getDatabase(context)
 
         // Initialize DAOs
         tripDao = database.tripDao()

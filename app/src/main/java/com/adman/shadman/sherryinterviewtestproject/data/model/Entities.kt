@@ -9,5 +9,5 @@ data class Trip(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val startTime: Long,
     val endTime: Long,
-    val distance: List<LatLng>
+    val distance: Long
 )
