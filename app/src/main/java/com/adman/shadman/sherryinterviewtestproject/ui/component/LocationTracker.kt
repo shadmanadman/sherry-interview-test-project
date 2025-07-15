@@ -75,7 +75,7 @@ class LocationTracker(private val fusedLocationClient: FusedLocationProviderClie
 
     @Suppress("MissingPermission")
     fun startLocationUpdates(minUpdateInterval:Long) {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, minUpdateInterval) // Update every 5 seconds
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, minUpdateInterval)
             .setMinUpdateIntervalMillis(minUpdateInterval)
             .build()
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())

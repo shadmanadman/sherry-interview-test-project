@@ -37,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.adman.shadman.sherryinterviewtestproject.R
+import com.adman.shadman.sherryinterviewtestproject.di.AppContainer
 import com.adman.shadman.sherryinterviewtestproject.ui.service.INTERVAL
 import com.adman.shadman.sherryinterviewtestproject.ui.service.LocationTrackingService
 import com.adman.shadman.sherryinterviewtestproject.ui.theme.Typography
@@ -55,7 +56,18 @@ fun TrackingTrips(
     locationTracker: LocationTracker,
     modifier: Modifier
 ) {
-    val currentMetrics by locationTracker.metrics
+    val state by settingViewModel.uiState.collectAsState()
+    val isBackgroundTrackingEnabled = state.backgroundTracking
+    val selectedTimeInterval =
+        state.interval.toDuration(DurationUnit.MILLISECONDS).inWholeMilliseconds
+
+    val noBackgroundLocationTracker = remember { LocationTracker(AppContainer.fusedClient) }
+
+    val currentMetrics by if (isBackgroundTrackingEnabled)
+        locationTracker.metrics
+    else
+        noBackgroundLocationTracker.metrics
+
     val context = LocalContext.current
 
     val startOfTripTime = remember { mutableLongStateOf(Instant.now().toEpochMilli()) }
@@ -65,10 +77,6 @@ fun TrackingTrips(
     var showUserTrips by remember { mutableStateOf(false) }
     var showSetting by remember { mutableStateOf(false) }
 
-    val state by settingViewModel.uiState.collectAsState()
-
-    val selectedTimeInterval =
-        state.interval.toDuration(DurationUnit.MILLISECONDS).inWholeMilliseconds
 
     if (showUserTrips)
         AllTripScreen(
@@ -185,7 +193,11 @@ fun TrackingTrips(
                             endTime = endOfTripTime.longValue,
                             distance = ((currentMetrics.distanceMeters / 1000).toLong())
                         )
-                        context.stopTrackingService()
+                        if (isBackgroundTrackingEnabled)
+                            context.stopTrackingService()
+                        else
+                            noBackgroundLocationTracker.stopTracking()
+
                         Toast.makeText(
                             context,
                             "Tracking Stopped! Your trip has been saved.",
@@ -207,7 +219,11 @@ fun TrackingTrips(
                 IconButton(onClick = {
                     startOfTripTime.longValue = Instant.now().toEpochMilli()
                     hasUserStartedTracking = true
-                    context.startTrackingService(selectedTimeInterval)
+                    if (isBackgroundTrackingEnabled)
+                        context.startTrackingService(selectedTimeInterval)
+                    else
+                        noBackgroundLocationTracker.startTracking(selectedTimeInterval)
+
                     Toast.makeText(context, "Tracking Started!", Toast.LENGTH_SHORT).show()
                 }) {
                     Icon(

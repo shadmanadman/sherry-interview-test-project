@@ -41,9 +41,7 @@ fun MapScreen(
             if (pathPoints.isNotEmpty())
                 cameraPositionState.move(update = CameraUpdateFactory.newLatLng(pathPoints.last()))
         }
-        onDispose {
-            locationTracker.pauseTracking()
-        }
+        onDispose {  }
     }
 
     GoogleMap(

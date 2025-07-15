@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 data class SettingsUiState(
     val interval: Int = 1,
-    val backgroundTracking: Boolean = false
+    val backgroundTracking: Boolean = true
 )
 
 class SettingViewModel(private val settingsDataStore: SettingsDataStore) : ViewModel() {
