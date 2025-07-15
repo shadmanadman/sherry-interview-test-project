@@ -16,3 +16,8 @@ I created a custom Dependency injection to let you know my deep understanding of
 DataStore to save settings. 
 
 You can find the apk in release folder. here are some screenshots:
+<img src="https://github.com/shadmanadman/sherry-interview-test-project/blob/main/screenshots/Screenshot_1752563170.png" width="300px">
+<img src="https://github.com/shadmanadman/sherry-interview-test-project/blob/main/screenshots/Screenshot_1752563185.png" width="300px">
+<img src="https://github.com/shadmanadman/sherry-interview-test-project/blob/main/screenshots/Screenshot_1752564018.png" width="300px">
+<img src="https://github.com/shadmanadman/sherry-interview-test-project/blob/main/screenshots/Screenshot_1752564038.png" width="300px">
+
